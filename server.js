@@ -5,12 +5,14 @@ const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
 const fs = require("fs");
 const cors = require("cors");
-app.use(cors());
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const app = express();
+app.use(cors());  // <-- ENABLE THIS
+
 const upload = multer({ dest: "uploads/" });
+
 
 const KRUTRIM_KEY = "YOUR_KRUTRIM_KEY"; // change this
 
