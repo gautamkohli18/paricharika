@@ -4,6 +4,8 @@ const fetch = require("node-fetch");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
 const fs = require("fs");
+const cors = require("cors");
+app.use(cors());
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
