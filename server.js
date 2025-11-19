@@ -9,73 +9,90 @@ const cors = require("cors");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const app = express();
-app.use(cors());  // <-- ENABLE THIS
+app.use(cors());
 
 const upload = multer({ dest: "uploads/" });
-
-
-const KRUTRIM_KEY = "SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh"; // change this
+const KRUTRIM_KEY = process.env.KRUTRIM_KEY || "SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh";  // Replace for now
 
 app.post("/asr", upload.single("audio"), async (req, res) => {
     try {
         const inputPath = req.file.path;
         const wavPath = `${inputPath}.wav`;
 
-        // Convert WebM → WAV
-       await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-        .format("wav")
-        .audioCodec("pcm_s16le")   // <--- MUST HAVE (16-bit PCM)
-        .audioFrequency(16000)     // <--- MUST HAVE (16kHz)
-        .audioChannels(1)          // <--- MUST HAVE (mono)
-        .on("end", resolve)
-        .on("error", reject)
-        .save(wavPath);
-});
+        // Convert WebM → WAV (pcm_s16le, mono, 16kHz)
+        await new Promise((resolve, reject) => {
+            ffmpeg(inputPath)
+                .format("wav")
+                .audioCodec("pcm_s16le")
+                .audioFrequency(16000)
+                .audioChannels(1)
+                .on("end", resolve)
+                .on("error", reject)
+                .save(wavPath);
+        });
 
-
+        // Read converted WAV
         const wavBuffer = fs.readFileSync(wavPath);
         const base64Audio = wavBuffer.toString("base64");
 
-        // Krutrim ASR call
-       const response = await fetch(
-    "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-v2:predict",
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${KRUTRIM_KEY}`
-        },
-        body: JSON.stringify({
-            model: "shruti-hinglish-v2",
-            instances: [
-                {
-                    audioFile: base64Audio
-                }
-            ]
-        })
-    }
-);
+        console.log("WAV size:", wavBuffer.length);
 
+        // --- CALL KRUTRIM ASR ---
+        const response = await fetch(
+            "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-v2:predict",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${KRUTRIM_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "shruti-hinglish-v2",
+                    instances: [
+                        {
+                            audioFile: base64Audio
+                        }
+                    ]
+                })
+            }
+        );
 
-        const result = await response.json();
+        const rawText = await response.text();
+        console.log("Krutrim raw:", rawText);
 
-        console.log("ASR response:", result);
+        if (!response.ok) {
+            return res.status(500).json({
+                error: "Krutrim API error",
+                status: response.status,
+                details: rawText
+            });
+        }
+
+        let resultJson = {};
+        try {
+            resultJson = JSON.parse(rawText);
+        } catch (err) {
+            console.log("JSON parse error:", err);
+            return res.status(500).json({ error: "Invalid JSON from Krutrim" });
+        }
+
+        console.log("Parsed JSON:", resultJson);
 
         const transcript =
-            result?.predictions?.[0]?.transcript ||
-            result?.text ||
-            result?.result ||
+            resultJson?.predictions?.[0]?.transcript ||
+            resultJson?.text ||
+            resultJson?.result ||
             "";
 
         res.json({ transcript });
 
+        // Cleanup
         fs.unlinkSync(inputPath);
         fs.unlinkSync(wavPath);
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "ASR failed" });
+        console.error("ASR error:", err);
+        res.status(500).json({ error: "ASR failed", details: err.message });
     }
 });
 
