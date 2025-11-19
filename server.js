@@ -38,23 +38,25 @@ app.post("/asr", upload.single("audio"), async (req, res) => {
         const base64Audio = wavBuffer.toString("base64");
 
         // Krutrim ASR call
-        const response = await fetch(
-            "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-1-romanised:predict",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${KRUTRIM_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "shruti-hinglish-1-romanised",
-                    audio: {
-                        data: base64Audio,
-                        encoding: "wav"
-                    }
-                })
-            }
-        );
+       const response = await fetch(
+    "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-v2:predict",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${KRUTRIM_KEY}`
+        },
+        body: JSON.stringify({
+            model: "shruti-hinglish-v2",
+            instances: [
+                {
+                    audioFile: base64Audio
+                }
+            ]
+        })
+    }
+);
+
 
         const result = await response.json();
 
