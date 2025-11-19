@@ -25,12 +25,6 @@
             border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            animation: slideUp 0.6s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -40,7 +34,6 @@
             color: white;
         }
 
-        .header h1 { font-size: 2.5em; margin-bottom: 5px; }
         .chat-container {
             height: 400px;
             overflow-y: auto;
@@ -74,25 +67,11 @@
             font-size: 20px;
         }
 
-        .controls {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        #userInput {
-            flex: 1;
-            padding: 15px;
-            border-radius: 25px;
-            border: 2px solid #e0e0e0;
-        }
+        .controls { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
+        #userInput { flex: 1; padding: 15px; border-radius: 25px; border: 2px solid #e0e0e0; }
 
         .btn-voice.recording { animation: pulse 1s infinite; }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse { 0% {opacity:1;} 50%{opacity:.6;} 100%{opacity:1;} }
 
         .status { text-align: center; padding: 10px; }
     </style>
@@ -115,11 +94,11 @@
     <div class="controls">
         <div class="input-container" style="display:flex; gap:10px;">
             <input id="userInput" type="text" placeholder="Type your order..." onkeypress="if(event.key==='Enter') sendMessage();">
-            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            <button onclick="sendMessage()">Send</button>
         </div>
 
-        <div class="button-row" style="margin-top:10px; display:flex; gap:10px;">
-            <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
+        <div style="margin-top:10px; display:flex; gap:10px;">
+            <button class="btn-voice" id="voiceBtn" onclick="toggleVoice()">
                 <span id="voiceIcon">🎤</span>
                 <span id="voiceText">Voice Order</span>
             </button>
@@ -129,80 +108,53 @@
     </div>
 </div>
 
-<script>
 
-     // ---------------------------
-//  CONFIG
+<script>
+// ---------------------------
+// GLOBALS
 // ---------------------------
 const API_KEYS = {
-    GROQ: "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"
+    GROQ: "YOUR_GROQ_KEY"
 };
 
 let isRecording = false;
 let mediaRecorder = null;
 let audioChunks = [];
+let silenceTimer = null;
+let silenceTimeoutMs = 5000;
+let continuousMode = true;
 let conversationHistory = [];
 
-
 // ---------------------------
-//  UTIL FUNCTIONS
+// CHAT HELPERS
 // ---------------------------
 function addMessage(text, isUser = false) {
     const chat = document.getElementById("chatContainer");
     const div = document.createElement("div");
     div.className = `message ${isUser ? "user" : "assistant"}`;
-
     div.innerHTML = `
         <div class="avatar">${isUser ? "👤" : "🤖"}</div>
         <div class="bubble">${text}</div>
     `;
-
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 }
 
 function speakText(text) {
-    if (!("speechSynthesis" in window)) return;
-
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = "hi-IN";
-    utter.rate = 1;
-    utter.pitch = 1;
-
     speechSynthesis.cancel();
     speechSynthesis.speak(utter);
 }
 
-
 // ---------------------------
-//  SEND MESSAGE (manual)
-// ---------------------------
-async function sendMessage(textOverride = null) {
-    const input = document.getElementById("userInput");
-    const userMsg = textOverride || input.value.trim();
-    if (!userMsg) return;
-
-    if (!textOverride) input.value = "";
-
-    addMessage(userMsg, true);
-
-    const reply = await getAIResponse(userMsg);
-    addMessage(reply, false);
-    speakText(reply);
-}
-
-
-// ---------------------------
-//  AI RESPONSE
+// GROQ AI RESPONSE
 // ---------------------------
 async function getAIResponse(userMessage) {
     conversationHistory.push({ role: "user", content: userMessage });
 
-    const systemPrompt = `You are Paricharika, a friendly Hinglish food-ordering assistant. 
-Keep responses short and conversational.`;
-
     const messages = [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: "You are Paricharika, a friendly Hinglish assistant." },
         ...conversationHistory.slice(-4)
     ];
 
@@ -214,28 +166,44 @@ Keep responses short and conversational.`;
         },
         body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
-            messages,
             temperature: 0.6,
-            max_tokens: 120
+            messages
         })
     });
 
     const data = await resp.json();
-    const botReply = data.choices[0].message.content;
+    const reply = data.choices[0].message.content;
 
-    conversationHistory.push({ role: "assistant", content: botReply });
-
-    return botReply;
+    conversationHistory.push({ role: "assistant", content: reply });
+    return reply;
 }
 
+// ---------------------------
+// SEND MESSAGE
+// ---------------------------
+async function sendMessage(textOverride = null) {
+    const input = document.getElementById("userInput");
+    const msg = textOverride || input.value.trim();
+    if (!msg) return;
+
+    if (!textOverride) input.value = "";
+
+    addMessage(msg, true);
+
+    const reply = await getAIResponse(msg);
+    addMessage(reply, false);
+    speakText(reply);
+}
 
 // ---------------------------
-//  VOICE RECORDING
+// VOICE RECORDING (Continuous)
 // ---------------------------
-async function toggleVoice() {
+async function toggleVoice(auto = false) {
     const btn = document.getElementById("voiceBtn");
     const icon = document.getElementById("voiceIcon");
     const text = document.getElementById("voiceText");
+
+    if (!auto) continuousMode = false;
 
     if (!isRecording) {
         try {
@@ -247,12 +215,21 @@ async function toggleVoice() {
             mediaRecorder = new MediaRecorder(stream, options);
             audioChunks = [];
 
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.ondataavailable = e => {
+                audioChunks.push(e.data);
+
+                if (silenceTimer) clearTimeout(silenceTimer);
+                silenceTimer = setTimeout(() => toggleVoice(true), silenceTimeoutMs);
+            };
 
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-                await processVoiceInput(audioBlob);
+                const blob = new Blob(audioChunks, { type: "audio/webm" });
                 stream.getTracks().forEach(t => t.stop());
+                await processVoiceInput(blob);
+
+                if (continuousMode) {
+                    setTimeout(() => toggleVoice(true), 400);
+                }
             };
 
             mediaRecorder.start();
@@ -260,12 +237,11 @@ async function toggleVoice() {
 
             btn.classList.add("recording");
             icon.textContent = "⏹️";
-            text.textContent = "Stop";
+            text.textContent = "Listening...";
+            document.getElementById("status").innerText = "🎤 Listening…";
 
-            document.getElementById("status").innerText = "🎤 Listening...";
-
-        } catch (e) {
-            alert("Microphone blocked.");
+        } catch (err) {
+            alert("Mic blocked.");
         }
     } else {
         mediaRecorder.stop();
@@ -274,57 +250,47 @@ async function toggleVoice() {
         btn.classList.remove("recording");
         icon.textContent = "🎤";
         text.textContent = "Voice Order";
-
-        document.getElementById("status").innerText = "Processing...";
+        document.getElementById("status").innerText = "";
     }
 }
 
-
 // ---------------------------
-//  PROCESS AUDIO → ASR → AUTO CHAT
+// PROCESS RECORDED AUDIO
 // ---------------------------
-async function processVoiceInput(audioBlob) {
-    const formData = new FormData();
-    formData.append("audio", audioBlob, "audio.webm");
+async function processVoiceInput(blob) {
+    const form = new FormData();
+    form.append("audio", blob, "audio.webm");
 
     try {
         const resp = await fetch("https://paricharika.onrender.com/asr", {
             method: "POST",
-            body: formData
+            body: form
         });
 
         const data = await resp.json();
         const transcript = data.transcript?.trim();
 
-        if (!transcript) {
-            document.getElementById("status").innerText = "Didn't understand. Try again.";
-            return;
-        }
+        if (!transcript) return;
 
-        document.getElementById("status").innerText = "";
-
-        // 1. Show user's voice message
         addMessage(transcript, true);
 
-        // 2. Get AI reply
         const reply = await getAIResponse(transcript);
-
-        // 3. Show reply
         addMessage(reply, false);
-
-        // 4. Speak reply
         speakText(reply);
 
     } catch (err) {
-        console.error(err);
-        document.getElementById("status").innerText = "Error in ASR.";
+        console.error("ASR error:", err);
     }
 }
+
+// ---------------------------
+// AUTO-START CONTINUOUS MODE
+// ---------------------------
+window.onload = () => {
+    continuousMode = true;
+    toggleVoice(true);
+};
 </script>
 
-</body>
-</html>
-
-    </script>
 </body>
 </html>
