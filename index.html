@@ -804,6 +804,25 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
                 requestAnimationFrame(detectSound);
             }
         }
+        function detectSpeechStart() {
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    function check() {
+        analyser.getByteFrequencyData(dataArray);
+
+        const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+
+        if (avg > 18 && !isRecording) { 
+            console.log("Voice detected. Starting recording...");
+            toggleVoice(); // start recording
+            return;
+        }
+
+        requestAnimationFrame(check);
+    }
+
+    check();
+}
 
         async function toggleVoice() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
