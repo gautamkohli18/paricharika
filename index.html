@@ -654,7 +654,7 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
     formData.append("audio", audioBlob, "audio.webm");
 
     try {
-        const response = await fetch("https://paricharika.onrender.com/asr", {, {
+        const response = await fetch("https://paricharika.onrender.com/asr", {
             method: "POST",
             body: formData
         });
@@ -673,6 +673,7 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
         setStatus("❌ Error processing audio. Please try typing instead.");
     }
 }
+
 
 
 
