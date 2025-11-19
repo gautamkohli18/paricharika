@@ -782,7 +782,7 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             
             silenceTimer = setTimeout(() => {
                 if (isRecording) {
-                    console.log('5 seconds of silence detected, stopping recording...');
+                    console.log('Dude, are you speaking???👀');
                     toggleVoice();
                 }
             }, 2500);
@@ -864,9 +864,9 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
                         const audioBlob = new Blob(audioChunks, { type: options.mimeType });
                         await processVoiceInput(audioBlob);
                         
-                        audioStream.getTracks().forEach(track => track.stop());
-                        if (audioContext) {
-                            audioContext.close();
+                        // audioStream.getTracks().forEach(track => track.stop());
+                        // if (audioContext) {
+                        //     audioContext.close();
                         }
                     };
 
