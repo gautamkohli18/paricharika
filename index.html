@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -73,6 +73,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             position: relative;
             z-index: 1;
+            font-weight: 600;
         }
 
         .header .subtitle {
@@ -80,10 +81,72 @@
             opacity: 0.95;
             position: relative;
             z-index: 1;
+            font-weight: 400;
+        }
+
+        .menu-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .menu-item-card {
+            background: white;
+            border-radius: 15px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .menu-item-card:active {
+            transform: translateY(-2px);
+        }
+
+        .menu-item-thumbnail {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 8px;
+            font-size: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .menu-item-card h4 {
+            font-size: 0.9em;
+            margin-bottom: 3px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .menu-item-card .hindi-name {
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .menu-item-card .price {
+            font-size: 1em;
+            font-weight: 700;
+            color: #d32f2f;
         }
 
         .chat-container {
-            height: 400px;
+            height: 350px;
             overflow-y: auto;
             padding: 20px;
             background: #f8f9fa;
@@ -160,6 +223,7 @@
             color: #d32f2f;
             margin-bottom: 15px;
             font-size: 1.3em;
+            font-weight: 600;
         }
 
         .order-item {
@@ -180,7 +244,7 @@
             color: white;
             border-radius: 10px;
             font-size: 1.2em;
-            font-weight: bold;
+            font-weight: 700;
             margin-top: 10px;
         }
 
@@ -204,6 +268,7 @@
             font-size: 16px;
             outline: none;
             transition: all 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
         }
 
         #userInput:focus {
@@ -216,7 +281,7 @@
             border: none;
             border-radius: 25px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -297,6 +362,43 @@
             font-style: italic;
         }
 
+        .waveform-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            height: 60px;
+            margin: 10px 0;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border-radius: 15px;
+        }
+
+        .waveform-container.active {
+            display: flex;
+        }
+
+        .waveform-bar {
+            width: 4px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 2px;
+            animation: waveAnimation 1.2s ease-in-out infinite;
+        }
+
+        .waveform-bar:nth-child(1) { animation-delay: 0s; }
+        .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+        .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+        .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
+        .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
+        .waveform-bar:nth-child(6) { animation-delay: 0.3s; }
+        .waveform-bar:nth-child(7) { animation-delay: 0.2s; }
+        .waveform-bar:nth-child(8) { animation-delay: 0.1s; }
+
+        @keyframes waveAnimation {
+            0%, 100% { height: 10px; }
+            50% { height: 40px; }
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 1.8em;
@@ -310,6 +412,10 @@
                 padding: 12px 20px;
                 font-size: 14px;
             }
+
+            .menu-gallery {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
         }
     </style>
 </head>
@@ -318,6 +424,58 @@
         <div class="header">
             <h1>🍽️ परिचारिका</h1>
             <div class="subtitle">Paricharika - Your AI Food Ordering Assistant</div>
+        </div>
+
+        <!-- Food Gallery -->
+        <div class="menu-gallery" id="menuGallery">
+            <div class="menu-item-card" onclick="quickOrder('Chai', 20)">
+                <div class="menu-item-thumbnail">☕</div>
+                <h4>Chai</h4>
+                <div class="hindi-name">चाय</div>
+                <div class="price">₹20</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Coffee', 30)">
+                <div class="menu-item-thumbnail">☕</div>
+                <h4>Coffee</h4>
+                <div class="hindi-name">कॉफ़ी</div>
+                <div class="price">₹30</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Lassi', 40)">
+                <div class="menu-item-thumbnail">🥛</div>
+                <h4>Lassi</h4>
+                <div class="hindi-name">लस्सी</div>
+                <div class="price">₹40</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Samosa', 15)">
+                <div class="menu-item-thumbnail">🥟</div>
+                <h4>Samosa</h4>
+                <div class="hindi-name">समोसा</div>
+                <div class="price">₹15</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Vada Pav', 25)">
+                <div class="menu-item-thumbnail">🍔</div>
+                <h4>Vada Pav</h4>
+                <div class="hindi-name">वड़ा पाव</div>
+                <div class="price">₹25</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Sandwich', 40)">
+                <div class="menu-item-thumbnail">🥪</div>
+                <h4>Sandwich</h4>
+                <div class="hindi-name">सैंडविच</div>
+                <div class="price">₹40</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Dal Chawal', 80)">
+                <div class="menu-item-thumbnail">🍛</div>
+                <h4>Dal Chawal</h4>
+                <div class="hindi-name">दाल चावल</div>
+                <div class="price">₹80</div>
+            </div>
+            <div class="menu-item-card" onclick="quickOrder('Thali', 120)">
+                <div class="menu-item-thumbnail">🍱</div>
+                <h4>Thali</h4>
+                <div class="hindi-name">थाली</div>
+                <div class="price">₹120</div>
+            </div>
         </div>
 
         <div class="chat-container" id="chatContainer">
@@ -344,13 +502,25 @@
                 >
                 <button class="btn btn-primary" onclick="sendMessage()">Send</button>
             </div>
+
+            <!-- Waveform Animation -->
+            <div class="waveform-container" id="waveform">
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+            </div>
             
             <div class="button-row">
                 <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
                     <span id="voiceIcon">🎤</span>
                     <span id="voiceText">Voice Order</span>
                 </button>
-                <button class="btn btn-primary" onclick="showMenu()">📋 Menu</button>
+                <button class="btn btn-primary" onclick="showMenu()">📋 Full Menu</button>
                 <button class="btn btn-primary" onclick="confirmOrder()">✅ Confirm Order</button>
             </div>
             
@@ -359,27 +529,24 @@
     </div>
 
     <script>
-        // Configuration - UPDATE THESE WITH YOUR API KEYS
         const API_KEYS = {
-            KRUTRIM: 'SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh',  // Update this
-            GROQ: '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',        // Update this
-            GOOGLE: 'AIzaSyCDaF9tmMwtfTENhJCCaIyIeRgelNnLE4w'     // Optional for TTS
+            GROQ: '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'
         };
 
         const MENU = {
             beverages: [
-                { name: 'Chai', hindi: 'चाय', price: 20 },
-                { name: 'Coffee', hindi: 'कॉफ़ी', price: 30 },
-                { name: 'Lassi', hindi: 'लस्सी', price: 40 }
+                { name: 'Chai', hindi: 'चाय', price: 20, emoji: '☕' },
+                { name: 'Coffee', hindi: 'कॉफ़ी', price: 30, emoji: '☕' },
+                { name: 'Lassi', hindi: 'लस्सी', price: 40, emoji: '🥛' }
             ],
             snacks: [
-                { name: 'Samosa', hindi: 'समोसा', price: 15 },
-                { name: 'Vada Pav', hindi: 'वड़ा पाव', price: 25 },
-                { name: 'Sandwich', hindi: 'सैंडविच', price: 40 }
+                { name: 'Samosa', hindi: 'समोसा', price: 15, emoji: '🥟' },
+                { name: 'Vada Pav', hindi: 'वड़ा पाव', price: 25, emoji: '🍔' },
+                { name: 'Sandwich', hindi: 'सैंडविच', price: 40, emoji: '🥪' }
             ],
             meals: [
-                { name: 'Dal Chawal', hindi: 'दाल चावल', price: 80 },
-                { name: 'Thali', hindi: 'थाली', price: 120 }
+                { name: 'Dal Chawal', hindi: 'दाल चावल', price: 80, emoji: '🍛' },
+                { name: 'Thali', hindi: 'थाली', price: 120, emoji: '🍱' }
             ]
         };
 
@@ -388,6 +555,32 @@
         let isRecording = false;
         let mediaRecorder = null;
         let audioChunks = [];
+        let silenceTimer = null;
+        let audioContext = null;
+        let analyser = null;
+        let audioStream = null;
+        let speechSynthesis = window.speechSynthesis;
+        let hindiVoice = null;
+
+        // Initialize Hindi voice for TTS
+        function initVoices() {
+            const voices = speechSynthesis.getVoices();
+            hindiVoice = voices.find(voice => 
+                voice.lang.startsWith('hi') || 
+                voice.lang.includes('IN')
+            ) || voices.find(voice => voice.lang.startsWith('en-IN')) || voices[0];
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = initVoices;
+        }
+
+        function quickOrder(itemName, price) {
+            currentOrder.push({ name: itemName, price: price, quantity: 1 });
+            updateOrderSummary();
+            addMessage(`${itemName} added to order! ✅`, false);
+            speakText(`${itemName} order mein add ho gaya`);
+        }
 
         function addMessage(text, isUser = false) {
             const chatContainer = document.getElementById('chatContainer');
@@ -431,20 +624,14 @@
             input.value = '';
             addMessage(message, true);
             
-            // Extract order items
             extractOrderFromText(message);
             
-            // Get AI response
             showThinking();
             try {
                 const response = await getAIResponse(message);
                 removeThinking();
                 addMessage(response);
-                
-                // Speak response if Google API key provided
-                if (API_KEYS.GOOGLE) {
-                    speakText(response);
-                }
+                speakText(response);
             } catch (error) {
                 removeThinking();
                 addMessage('Sorry, kuch problem ho gayi. Please try again.');
@@ -458,7 +645,7 @@
             conversationHistory.push({ role: 'user', content: userMessage });
             
             const systemPrompt = `You are Paricharika, a friendly food ordering assistant. Speak in natural Hinglish.
-Menu: Chai(₹20), Coffee(₹30), Samosa(₹15), Vada Pav(₹25), Dal Chawal(₹80), Thali(₹120)
+Menu: Chai(₹20), Coffee(₹30), Lassi(₹40), Samosa(₹15), Vada Pav(₹25), Sandwich(₹40), Dal Chawal(₹80), Thali(₹120)
 Respond in 1-2 sentences only in conversational Hinglish.`;
 
             const messages = [
@@ -501,7 +688,7 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             const lower = text.toLowerCase();
             
             if (lower.includes('menu') || lower.includes('kya hai')) {
-                return 'Hamare paas chai, coffee, samosa, vada pav, dal chawal, thali available hai. Kya lenge?';
+                return 'Hamare paas chai, coffee, lassi, samosa, vada pav, sandwich, dal chawal, thali available hai. Kya lenge?';
             } else if (lower.includes('chai')) {
                 return 'Bilkul! Chai aa rahi hai, ₹20 ki. Aur kuch?';
             } else if (lower.includes('samosa')) {
@@ -515,8 +702,10 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             const items = {
                 'chai': { name: 'Chai', price: 20 },
                 'coffee': { name: 'Coffee', price: 30 },
+                'lassi': { name: 'Lassi', price: 40 },
                 'samosa': { name: 'Samosa', price: 15 },
                 'vada pav': { name: 'Vada Pav', price: 25 },
+                'sandwich': { name: 'Sandwich', price: 40 },
                 'dal chawal': { name: 'Dal Chawal', price: 80 },
                 'thali': { name: 'Thali', price: 120 }
             };
@@ -573,12 +762,12 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
         }
 
         function showMenu() {
-            let menuText = '📋 *Menu*\n\n';
+            let menuText = '📋 *Complete Menu*\n\n';
             
             for (const [category, items] of Object.entries(MENU)) {
                 menuText += `*${category.toUpperCase()}*\n`;
                 items.forEach(item => {
-                    menuText += `• ${item.name} (${item.hindi}) - ₹${item.price}\n`;
+                    menuText += `${item.emoji} ${item.name} (${item.hindi}) - ₹${item.price}\n`;
                 });
                 menuText += '\n';
             }
@@ -586,117 +775,156 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             addMessage(menuText.replace(/\n/g, '<br>').replace(/\*/g, '<strong>').replace(/<\/strong>/g, '</strong>'));
         }
 
-   async function toggleVoice() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Voice recording not supported in your browser');
-        return;
-    }
-
-    const voiceBtn = document.getElementById('voiceBtn');
-    const voiceIcon = document.getElementById('voiceIcon');
-    const voiceText = document.getElementById('voiceText');
-
-    if (!isRecording) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            // 💥 IMPORTANT: Set correct MIME type
-            let options = { mimeType: "audio/webm" };
-
-            // Fallback detection: some browsers reject unsupported mimetypes
-            if (!MediaRecorder.isTypeSupported("audio/webm")) {
-                options = { mimeType: "audio/ogg" };
+        function resetSilenceTimer() {
+            if (silenceTimer) {
+                clearTimeout(silenceTimer);
             }
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                options = {}; // browser picks default
+            
+            silenceTimer = setTimeout(() => {
+                if (isRecording) {
+                    console.log('5 seconds of silence detected, stopping recording...');
+                    toggleVoice();
+                }
+            }, 5000);
+        }
+
+        function detectSound() {
+            if (!analyser || !isRecording) return;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            
+            if (average > 10) {
+                resetSilenceTimer();
             }
 
-            mediaRecorder = new MediaRecorder(stream, options);
-
-            audioChunks = [];
-
-            mediaRecorder.ondataavailable = (e) => {
-                audioChunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: options.mimeType });
-                await processVoiceInput(audioBlob);
-                
-                // Stop mic access
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
-
-            isRecording = true;
-            voiceBtn.classList.add('recording');
-            voiceIcon.textContent = '⏹️';
-            voiceText.textContent = 'Stop Recording';
-            setStatus('🎤 Recording... Speak now!');
-
-        } catch (error) {
-            console.error(error);
-            alert('Microphone access denied');
+            if (isRecording) {
+                requestAnimationFrame(detectSound);
+            }
         }
-    } else {
-        mediaRecorder.stop();
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceIcon.textContent = '🎤';
-        voiceText.textContent = 'Voice Order';
-        setStatus('Processing...');
-    }
-}
 
- async function processVoiceInput(audioBlob) {
-    const formData = new FormData();
-    formData.append("audio", audioBlob, "audio.webm");
+        async function toggleVoice() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Voice recording not supported in your browser');
+                return;
+            }
 
-    try {
-        const response = await fetch("https://paricharika.onrender.com/asr", {
-            method: "POST",
-            body: formData
-        });
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceIcon = document.getElementById('voiceIcon');
+            const voiceText = document.getElementById('voiceText');
+            const waveform = document.getElementById('waveform');
 
-        const data = await response.json();
-        console.log("Transcript from backend:", data);
+            if (!isRecording) {
+                try {
+                    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        if (data.transcript) {
-            document.getElementById("userInput").value = data.transcript;
-            setStatus("✅ Got it! Click Send or press Enter");
-        } else {
-            setStatus("❌ Could not understand. Please try again.");
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    const source = audioContext.createMediaStreamSource(audioStream);
+                    source.connect(analyser);
+                    analyser.fftSize = 256;
+
+                    let options = { mimeType: "audio/webm" };
+                    if (!MediaRecorder.isTypeSupported("audio/webm")) {
+                        options = { mimeType: "audio/ogg" };
+                    }
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                        options = {};
+                    }
+
+                    mediaRecorder = new MediaRecorder(audioStream, options);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        audioChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: options.mimeType });
+                        await processVoiceInput(audioBlob);
+                        
+                        audioStream.getTracks().forEach(track => track.stop());
+                        if (audioContext) {
+                            audioContext.close();
+                        }
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+
+                    voiceBtn.classList.add('recording');
+                    voiceIcon.textContent = '⏹️';
+                    voiceText.textContent = 'Listening...';
+                    waveform.classList.add('active');
+                    setStatus('🎤 Listening... Speak now! (Auto-stops after 5s silence)');
+
+                    resetSilenceTimer();
+                    detectSound();
+
+                } catch (error) {
+                    console.error(error);
+                    alert('Microphone access denied');
+                }
+            } else {
+                if (silenceTimer) {
+                    clearTimeout(silenceTimer);
+                }
+
+                mediaRecorder.stop();
+                isRecording = false;
+
+                voiceBtn.classList.remove('recording');
+                voiceIcon.textContent = '🎤';
+                voiceText.textContent = 'Voice Order';
+                waveform.classList.remove('active');
+                setStatus('Processing...');
+            }
         }
-    } catch (error) {
-        console.error(error);
-        setStatus("❌ Error processing audio. Please try typing instead.");
-    }
-}
 
-
-
-
-        async function speakText(text) {
-            if (!API_KEYS.GOOGLE) return;
+        async function processVoiceInput(audioBlob) {
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "audio.webm");
 
             try {
-                const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEYS.GOOGLE}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        input: { text: text },
-                        voice: { languageCode: 'hi-IN', name: 'hi-IN-Wavenet-D' },
-                        audioConfig: { audioEncoding: 'MP3' }
-                    })
+                const response = await fetch("https://paricharika.onrender.com/asr", {
+                    method: "POST",
+                    body: formData
                 });
 
                 const data = await response.json();
-                const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
-                audio.play();
+                console.log("Transcript from backend:", data);
+
+                if (data.transcript) {
+                    document.getElementById("userInput").value = data.transcript;
+                    setStatus("✅ Got it! Click Send or press Enter");
+                } else {
+                    setStatus("❌ Could not understand. Please try again.");
+                }
             } catch (error) {
-                console.error('TTS Error:', error);
+                console.error(error);
+                setStatus("❌ Error processing audio. Please try typing instead.");
             }
+        }
+
+        function speakText(text) {
+            if (!speechSynthesis) return;
+            
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            if (hindiVoice) {
+                utterance.voice = hindiVoice;
+            }
+            
+            utterance.lang = 'hi-IN';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            speechSynthesis.speak(utterance);
         }
 
         function confirmOrder() {
@@ -708,17 +936,18 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             const total = currentOrder.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const orderId = 'ORD' + Date.now();
             
-            addMessage(`✅ Order Confirmed!\nOrder ID: ${orderId}\nTotal: ₹${total}\n\nDhanyavaad! Aapka order 10-15 minute mein ready hoga. 🙏`);
+            const confirmMsg = `✅ Order Confirmed!\nOrder ID: ${orderId}\nTotal: ₹${total}\n\nDhanyavaad! Aapka order 10-15 minute mein ready hoga. 🙏`;
+            addMessage(confirmMsg);
+            speakText('Order confirm ho gaya. Dhanyavaad!');
             
-            // Reset
             currentOrder = [];
             updateOrderSummary();
             setStatus('');
         }
 
-        // Initialize
         window.onload = () => {
-            if (API_KEYS.KRUTRIM === 'SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh') {
+            initVoices();
+            if (API_KEYS.GROQ === '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') {
                 setStatus('⚠️ Please update API keys in the script!');
             }
         };
