@@ -22,14 +22,17 @@ app.post("/asr", upload.single("audio"), async (req, res) => {
         const wavPath = `${inputPath}.wav`;
 
         // Convert WebM → WAV
-        await new Promise((resolve, reject) => {
-            ffmpeg(inputPath)
-                .toFormat("wav")
-                .outputOptions(["-ac 1", "-ar 16000"]) // mono, 16kHz
-                .save(wavPath)
-                .on("end", resolve)
-                .on("error", reject);
-        });
+       await new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+        .format("wav")
+        .audioCodec("pcm_s16le")   // <--- MUST HAVE (16-bit PCM)
+        .audioFrequency(16000)     // <--- MUST HAVE (16kHz)
+        .audioChannels(1)          // <--- MUST HAVE (mono)
+        .on("end", resolve)
+        .on("error", reject)
+        .save(wavPath);
+});
+
 
         const wavBuffer = fs.readFileSync(wavPath);
         const base64Audio = wavBuffer.toString("base64");
