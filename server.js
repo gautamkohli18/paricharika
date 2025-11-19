@@ -9,17 +9,31 @@ const cors = require("cors");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const app = express();
-app.use(cors());
+
+// --- FIXED CORS CONFIG ---
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Handle preflight requests for all routes
+app.options("*", (req, res) => {
+    res.sendStatus(200);
+});
+
+// --------------------------
 
 const upload = multer({ dest: "uploads/" });
-const KRUTRIM_KEY = process.env.KRUTRIM_KEY || "SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh";  // Replace for now
+const KRUTRIM_KEY = process.env.KRUTRIM_KEY || "SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh";
 
+// ASR endpoint
 app.post("/asr", upload.single("audio"), async (req, res) => {
     try {
         const inputPath = req.file.path;
         const wavPath = `${inputPath}.wav`;
 
-        // Convert WebM → WAV (pcm_s16le, mono, 16kHz)
+        // Convert WebM → WAV
         await new Promise((resolve, reject) => {
             ffmpeg(inputPath)
                 .format("wav")
@@ -31,41 +45,32 @@ app.post("/asr", upload.single("audio"), async (req, res) => {
                 .save(wavPath);
         });
 
-        // Read converted WAV
         const wavBuffer = fs.readFileSync(wavPath);
         const base64Audio = wavBuffer.toString("base64");
 
-        console.log("WAV size:", wavBuffer.length);
-
-        // --- CALL KRUTRIM ASR ---
-       const response = await fetch(
-    "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-1-romanised:predict",
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${KRUTRIM_KEY}`
-        },
-        body: JSON.stringify({
-            model: "shruti-hinglish-1-romanised",
-            instances: [
-                {
-                    audioFile: base64Audio
-                }
-            ]
-        })
-    }
-);
-
+        // Call Krutrim ASR
+        const response = await fetch(
+            "https://cloud.olakrutrim.com/v1/models/shruti-hinglish-1-romanised:predict",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${KRUTRIM_KEY}`,
+                },
+                body: JSON.stringify({
+                    model: "shruti-hinglish-1-romanised",
+                    instances: [{ audioFile: base64Audio }],
+                }),
+            }
+        );
 
         const rawText = await response.text();
-        console.log("Krutrim raw:", rawText);
 
         if (!response.ok) {
             return res.status(500).json({
                 error: "Krutrim API error",
                 status: response.status,
-                details: rawText
+                details: rawText,
             });
         }
 
@@ -73,11 +78,8 @@ app.post("/asr", upload.single("audio"), async (req, res) => {
         try {
             resultJson = JSON.parse(rawText);
         } catch (err) {
-            console.log("JSON parse error:", err);
             return res.status(500).json({ error: "Invalid JSON from Krutrim" });
         }
-
-        console.log("Parsed JSON:", resultJson);
 
         const transcript =
             resultJson?.predictions?.[0]?.transcript ||
@@ -87,7 +89,7 @@ app.post("/asr", upload.single("audio"), async (req, res) => {
 
         res.json({ transcript });
 
-        // Cleanup
+        // Cleanup temp files
         fs.unlinkSync(inputPath);
         fs.unlinkSync(wavPath);
 
