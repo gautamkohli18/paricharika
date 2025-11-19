@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>परिचारिका - Paricharika | AI Food Ordering</title>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,14 +29,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -47,69 +38,23 @@
             padding: 30px;
             text-align: center;
             color: white;
-            position: relative;
-            overflow: hidden;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 1;
-        }
-
-        .header .subtitle {
-            font-size: 1.1em;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-        }
-
+        .header h1 { font-size: 2.5em; margin-bottom: 5px; }
         .chat-container {
             height: 400px;
             overflow-y: auto;
             padding: 20px;
             background: #f8f9fa;
-            scroll-behavior: smooth;
         }
 
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            animation: messageSlide 0.3s ease;
-        }
+        .message { display: flex; gap: 10px; margin-bottom: 15px; }
+        .message.user { flex-direction: row-reverse; }
 
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .message.user {
-            flex-direction: row-reverse;
+        .bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
         }
 
         .message.user .bubble {
@@ -119,69 +64,14 @@
 
         .message.assistant .bubble {
             background: white;
-            color: #333;
             border: 2px solid #e0e0e0;
         }
 
-        .bubble {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            word-wrap: break-word;
-        }
-
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .message.user .avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .message.assistant .avatar {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .order-summary {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 20px;
-            border-top: 3px solid #f5576c;
-        }
-
-        .order-summary h3 {
-            color: #d32f2f;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .order-total {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: #d32f2f;
-            color: white;
-            border-radius: 10px;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-top: 10px;
         }
 
         .controls {
@@ -190,538 +80,251 @@
             border-top: 1px solid #e0e0e0;
         }
 
-        .input-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
         #userInput {
             flex: 1;
             padding: 15px;
+            border-radius: 25px;
             border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s;
         }
 
-        #userInput:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .btn-voice.recording { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
         }
 
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-voice {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-voice.recording {
-            animation: recordPulse 1s infinite;
-        }
-
-        @keyframes recordPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .button-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .status {
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }
-
-        .thinking {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            padding: 10px;
-        }
-
-        .thinking span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #667eea;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .thinking span:nth-child(1) { animation-delay: -0.32s; }
-        .thinking span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        .empty-order {
-            text-align: center;
-            color: #999;
-            padding: 20px;
-            font-style: italic;
-        }
-
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .bubble {
-                max-width: 85%;
-            }
-            
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-        }
+        .status { text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🍽️ परिचारिका</h1>
-            <div class="subtitle">Paricharika - Your AI Food Ordering Assistant</div>
-        </div>
 
-        <div class="chat-container" id="chatContainer">
-            <div class="message assistant">
-                <div class="avatar">🤖</div>
-                <div class="bubble">
-                    Namaste! 🙏 Main Paricharika hoon. Main aapki order lene mein madad karungi. Kya lena pasand karenge?
-                </div>
-            </div>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1>🍽️ परिचारिका</h1>
+        <div class="subtitle">Paricharika - Your AI Food Ordering Assistant</div>
+    </div>
 
-        <div class="order-summary" id="orderSummary">
-            <h3>📋 Current Order</h3>
-            <div class="empty-order">No items yet. Start ordering!</div>
-        </div>
-
-        <div class="controls">
-            <div class="input-container">
-                <input 
-                    type="text" 
-                    id="userInput" 
-                    placeholder="Type your order here... (e.g., ek chai do samosa)"
-                    onkeypress="if(event.key==='Enter') sendMessage()"
-                >
-                <button class="btn btn-primary" onclick="sendMessage()">Send</button>
-            </div>
-            
-            <div class="button-row">
-                <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
-                    <span id="voiceIcon">🎤</span>
-                    <span id="voiceText">Voice Order</span>
-                </button>
-                <button class="btn btn-primary" onclick="showMenu()">📋 Menu</button>
-                <button class="btn btn-primary" onclick="confirmOrder()">✅ Confirm Order</button>
-            </div>
-            
-            <div class="status" id="status"></div>
+    <div class="chat-container" id="chatContainer">
+        <div class="message assistant">
+            <div class="avatar">🤖</div>
+            <div class="bubble">Namaste! 🙏 Main Paricharika hoon. Aap kya order karna chahenge?</div>
         </div>
     </div>
 
-    <script>
-        // Configuration - UPDATE THESE WITH YOUR API KEYS
-        const API_KEYS = {
-            KRUTRIM: 'SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh',  // Update this
-            GROQ: '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',        // Update this
-            GOOGLE: 'AIzaSyCDaF9tmMwtfTENhJCCaIyIeRgelNnLE4w'     // Optional for TTS
-        };
+    <div class="controls">
+        <div class="input-container" style="display:flex; gap:10px;">
+            <input id="userInput" type="text" placeholder="Type your order..." onkeypress="if(event.key==='Enter') sendMessage();">
+            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+        </div>
 
-        const MENU = {
-            beverages: [
-                { name: 'Chai', hindi: 'चाय', price: 20 },
-                { name: 'Coffee', hindi: 'कॉफ़ी', price: 30 },
-                { name: 'Lassi', hindi: 'लस्सी', price: 40 }
-            ],
-            snacks: [
-                { name: 'Samosa', hindi: 'समोसा', price: 15 },
-                { name: 'Vada Pav', hindi: 'वड़ा पाव', price: 25 },
-                { name: 'Sandwich', hindi: 'सैंडविच', price: 40 }
-            ],
-            meals: [
-                { name: 'Dal Chawal', hindi: 'दाल चावल', price: 80 },
-                { name: 'Thali', hindi: 'थाली', price: 120 }
-            ]
-        };
+        <div class="button-row" style="margin-top:10px; display:flex; gap:10px;">
+            <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
+                <span id="voiceIcon">🎤</span>
+                <span id="voiceText">Voice Order</span>
+            </button>
+        </div>
 
-        let currentOrder = [];
-        let conversationHistory = [];
-        let isRecording = false;
-        let mediaRecorder = null;
-        let audioChunks = [];
+        <div class="status" id="status"></div>
+    </div>
+</div>
 
-        function addMessage(text, isUser = false) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
-            
-            messageDiv.innerHTML = `
-                <div class="avatar">${isUser ? '👤' : '🤖'}</div>
-                <div class="bubble">${text}</div>
-            `;
-            
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+<script>
 
-        function showThinking() {
-            const chatContainer = document.getElementById('chatContainer');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.id = 'thinking';
-            thinkingDiv.className = 'thinking';
-            thinkingDiv.innerHTML = '<span></span><span></span><span></span>';
-            chatContainer.appendChild(thinkingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+     // ---------------------------
+//  CONFIG
+// ---------------------------
+const API_KEYS = {
+    GROQ: "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"
+};
 
-        function removeThinking() {
-            const thinking = document.getElementById('thinking');
-            if (thinking) thinking.remove();
-        }
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let conversationHistory = [];
 
-        function setStatus(text) {
-            document.getElementById('status').textContent = text;
-        }
 
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            input.value = '';
-            addMessage(message, true);
-            
-            // Extract order items
-            extractOrderFromText(message);
-            
-            // Get AI response
-            showThinking();
-            try {
-                const response = await getAIResponse(message);
-                removeThinking();
-                addMessage(response);
-                
-                // Speak response if Google API key provided
-                if (API_KEYS.GOOGLE) {
-                    speakText(response);
-                }
-            } catch (error) {
-                removeThinking();
-                addMessage('Sorry, kuch problem ho gayi. Please try again.');
-                console.error(error);
-            }
-            
-            updateOrderSummary();
-        }
+// ---------------------------
+//  UTIL FUNCTIONS
+// ---------------------------
+function addMessage(text, isUser = false) {
+    const chat = document.getElementById("chatContainer");
+    const div = document.createElement("div");
+    div.className = `message ${isUser ? "user" : "assistant"}`;
 
-        async function getAIResponse(userMessage) {
-            conversationHistory.push({ role: 'user', content: userMessage });
-            
-            const systemPrompt = `You are Paricharika, a friendly food ordering assistant. Speak in natural Hinglish.
-Menu: Chai(₹20), Coffee(₹30), Samosa(₹15), Vada Pav(₹25), Dal Chawal(₹80), Thali(₹120)
-Respond in 1-2 sentences only in conversational Hinglish.`;
+    div.innerHTML = `
+        <div class="avatar">${isUser ? "👤" : "🤖"}</div>
+        <div class="bubble">${text}</div>
+    `;
 
-            const messages = [
-                { role: 'system', content: systemPrompt },
-                ...conversationHistory.slice(-4)
-            ];
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
 
-            try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEYS.GROQ}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        messages: messages,
-                        temperature: 0.7,
-                        max_tokens: 150
-                    })
-                });
+function speakText(text) {
+    if (!("speechSynthesis" in window)) return;
 
-                if (!response.ok) {
-                    throw new Error('API request failed');
-                }
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "hi-IN";
+    utter.rate = 1;
+    utter.pitch = 1;
 
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-                
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
-                return aiResponse;
-                
-            } catch (error) {
-                console.error('AI Error:', error);
-                return getRuleBasedResponse(userMessage);
-            }
-        }
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+}
 
-        function getRuleBasedResponse(text) {
-            const lower = text.toLowerCase();
-            
-            if (lower.includes('menu') || lower.includes('kya hai')) {
-                return 'Hamare paas chai, coffee, samosa, vada pav, dal chawal, thali available hai. Kya lenge?';
-            } else if (lower.includes('chai')) {
-                return 'Bilkul! Chai aa rahi hai, ₹20 ki. Aur kuch?';
-            } else if (lower.includes('samosa')) {
-                return 'Zaroor! Samosa aa raha hai, ₹15 ka. Kuch aur?';
-            }
-            return 'Ji boliye, aap kya order karna chahenge?';
-        }
 
-        function extractOrderFromText(text) {
-            const lower = text.toLowerCase();
-            const items = {
-                'chai': { name: 'Chai', price: 20 },
-                'coffee': { name: 'Coffee', price: 30 },
-                'samosa': { name: 'Samosa', price: 15 },
-                'vada pav': { name: 'Vada Pav', price: 25 },
-                'dal chawal': { name: 'Dal Chawal', price: 80 },
-                'thali': { name: 'Thali', price: 120 }
-            };
+// ---------------------------
+//  SEND MESSAGE (manual)
+// ---------------------------
+async function sendMessage(textOverride = null) {
+    const input = document.getElementById("userInput");
+    const userMsg = textOverride || input.value.trim();
+    if (!userMsg) return;
 
-            const qtyMap = { 'ek': 1, 'do': 2, 'teen': 3, 'char': 4, '1': 1, '2': 2, '3': 3, '4': 4 };
+    if (!textOverride) input.value = "";
 
-            for (const [key, item] of Object.entries(items)) {
-                if (lower.includes(key)) {
-                    let qty = 1;
-                    for (const [word, num] of Object.entries(qtyMap)) {
-                        if (lower.includes(word)) {
-                            qty = num;
-                            break;
-                        }
-                    }
-                    currentOrder.push({ ...item, quantity: qty });
-                }
-            }
-        }
+    addMessage(userMsg, true);
 
-        function updateOrderSummary() {
-            const summaryDiv = document.getElementById('orderSummary');
-            
-            if (currentOrder.length === 0) {
-                summaryDiv.innerHTML = `
-                    <h3>📋 Current Order</h3>
-                    <div class="empty-order">No items yet. Start ordering!</div>
-                `;
-                return;
-            }
+    const reply = await getAIResponse(userMsg);
+    addMessage(reply, false);
+    speakText(reply);
+}
 
-            let html = '<h3>📋 Current Order</h3>';
-            let total = 0;
 
-            currentOrder.forEach((item, idx) => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                html += `
-                    <div class="order-item">
-                        <span>${item.name} x${item.quantity}</span>
-                        <span>₹${itemTotal}</span>
-                    </div>
-                `;
-            });
+// ---------------------------
+//  AI RESPONSE
+// ---------------------------
+async function getAIResponse(userMessage) {
+    conversationHistory.push({ role: "user", content: userMessage });
 
-            html += `
-                <div class="order-total">
-                    <span>Total</span>
-                    <span>₹${total}</span>
-                </div>
-            `;
+    const systemPrompt = `You are Paricharika, a friendly Hinglish food-ordering assistant. 
+Keep responses short and conversational.`;
 
-            summaryDiv.innerHTML = html;
-        }
+    const messages = [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory.slice(-4)
+    ];
 
-        function showMenu() {
-            let menuText = '📋 *Menu*\n\n';
-            
-            for (const [category, items] of Object.entries(MENU)) {
-                menuText += `*${category.toUpperCase()}*\n`;
-                items.forEach(item => {
-                    menuText += `• ${item.name} (${item.hindi}) - ₹${item.price}\n`;
-                });
-                menuText += '\n';
-            }
-            
-            addMessage(menuText.replace(/\n/g, '<br>').replace(/\*/g, '<strong>').replace(/<\/strong>/g, '</strong>'));
-        }
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEYS.GROQ}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages,
+            temperature: 0.6,
+            max_tokens: 120
+        })
+    });
 
-   async function toggleVoice() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Voice recording not supported in your browser');
-        return;
-    }
+    const data = await resp.json();
+    const botReply = data.choices[0].message.content;
 
-    const voiceBtn = document.getElementById('voiceBtn');
-    const voiceIcon = document.getElementById('voiceIcon');
-    const voiceText = document.getElementById('voiceText');
+    conversationHistory.push({ role: "assistant", content: botReply });
+
+    return botReply;
+}
+
+
+// ---------------------------
+//  VOICE RECORDING
+// ---------------------------
+async function toggleVoice() {
+    const btn = document.getElementById("voiceBtn");
+    const icon = document.getElementById("voiceIcon");
+    const text = document.getElementById("voiceText");
 
     if (!isRecording) {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-            // 💥 IMPORTANT: Set correct MIME type
             let options = { mimeType: "audio/webm" };
-
-            // Fallback detection: some browsers reject unsupported mimetypes
-            if (!MediaRecorder.isTypeSupported("audio/webm")) {
-                options = { mimeType: "audio/ogg" };
-            }
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                options = {}; // browser picks default
-            }
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) options = {};
 
             mediaRecorder = new MediaRecorder(stream, options);
-
             audioChunks = [];
 
-            mediaRecorder.ondataavailable = (e) => {
-                audioChunks.push(e.data);
-            };
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: options.mimeType });
+                const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
                 await processVoiceInput(audioBlob);
-                
-                // Stop mic access
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach(t => t.stop());
             };
 
             mediaRecorder.start();
-
             isRecording = true;
-            voiceBtn.classList.add('recording');
-            voiceIcon.textContent = '⏹️';
-            voiceText.textContent = 'Stop Recording';
-            setStatus('🎤 Recording... Speak now!');
 
-        } catch (error) {
-            console.error(error);
-            alert('Microphone access denied');
+            btn.classList.add("recording");
+            icon.textContent = "⏹️";
+            text.textContent = "Stop";
+
+            document.getElementById("status").innerText = "🎤 Listening...";
+
+        } catch (e) {
+            alert("Microphone blocked.");
         }
     } else {
         mediaRecorder.stop();
         isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceIcon.textContent = '🎤';
-        voiceText.textContent = 'Voice Order';
-        setStatus('Processing...');
+
+        btn.classList.remove("recording");
+        icon.textContent = "🎤";
+        text.textContent = "Voice Order";
+
+        document.getElementById("status").innerText = "Processing...";
     }
 }
 
- async function processVoiceInput(audioBlob) {
+
+// ---------------------------
+//  PROCESS AUDIO → ASR → AUTO CHAT
+// ---------------------------
+async function processVoiceInput(audioBlob) {
     const formData = new FormData();
     formData.append("audio", audioBlob, "audio.webm");
 
     try {
-        const response = await fetch("https://paricharika.onrender.com/asr", {
+        const resp = await fetch("https://paricharika.onrender.com/asr", {
             method: "POST",
             body: formData
         });
 
-        const data = await response.json();
-        console.log("Transcript from backend:", data);
+        const data = await resp.json();
+        const transcript = data.transcript?.trim();
 
-        if (data.transcript) {
-            document.getElementById("userInput").value = data.transcript;
-            setStatus("✅ Got it! Click Send or press Enter");
-        } else {
-            setStatus("❌ Could not understand. Please try again.");
+        if (!transcript) {
+            document.getElementById("status").innerText = "Didn't understand. Try again.";
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        setStatus("❌ Error processing audio. Please try typing instead.");
+
+        document.getElementById("status").innerText = "";
+
+        // 1. Show user's voice message
+        addMessage(transcript, true);
+
+        // 2. Get AI reply
+        const reply = await getAIResponse(transcript);
+
+        // 3. Show reply
+        addMessage(reply, false);
+
+        // 4. Speak reply
+        speakText(reply);
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "Error in ASR.";
     }
 }
+</script>
 
+</body>
+</html>
 
-
-
-        async function speakText(text) {
-            if (!API_KEYS.GOOGLE) return;
-
-            try {
-                const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEYS.GOOGLE}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        input: { text: text },
-                        voice: { languageCode: 'hi-IN', name: 'hi-IN-Wavenet-D' },
-                        audioConfig: { audioEncoding: 'MP3' }
-                    })
-                });
-
-                const data = await response.json();
-                const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
-                audio.play();
-            } catch (error) {
-                console.error('TTS Error:', error);
-            }
-        }
-
-        function confirmOrder() {
-            if (currentOrder.length === 0) {
-                alert('Koi order nahi hai! Pehle order karein.');
-                return;
-            }
-
-            const total = currentOrder.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const orderId = 'ORD' + Date.now();
-            
-            addMessage(`✅ Order Confirmed!\nOrder ID: ${orderId}\nTotal: ₹${total}\n\nDhanyavaad! Aapka order 10-15 minute mein ready hoga. 🙏`);
-            
-            // Reset
-            currentOrder = [];
-            updateOrderSummary();
-            setStatus('');
-        }
-
-        // Initialize
-        window.onload = () => {
-            if (API_KEYS.KRUTRIM === 'SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh') {
-                setStatus('⚠️ Please update API keys in the script!');
-            }
-        };
     </script>
 </body>
 </html>
