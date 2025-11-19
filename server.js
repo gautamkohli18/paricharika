@@ -14,7 +14,7 @@ app.use(cors());  // <-- ENABLE THIS
 const upload = multer({ dest: "uploads/" });
 
 
-const KRUTRIM_KEY = "YOUR_KRUTRIM_KEY"; // change this
+const KRUTRIM_KEY = "SlMqiQXZQIuzSTWlZ_r9bi22SNgDXLh"; // change this
 
 app.post("/asr", upload.single("audio"), async (req, res) => {
     try {
