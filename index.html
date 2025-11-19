@@ -882,6 +882,22 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
                 setStatus('Processing...');
             }
         }
+        async function startPassiveListening() {
+
+    try {
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        
+        const source = audioContext.createMediaStreamSource(audioStream);
+        source.connect(analyser);
+        analyser.fftSize = 256;
+
+        detectSpeechStart();
+    } catch (error) {
+        console.error("Microphone access failed:", error);
+    }
+}
 
         async function processVoiceInput(audioBlob) {
             const formData = new FormData();
@@ -900,6 +916,11 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
                     document.getElementById("userInput").value = data.transcript;
                     setStatus("🎤 Processing your order...");
                     sendMessage();
+                    // After sending the message, start listening again automatically
+                    setTimeout(() => {
+                        startPassiveListening();
+                    }, 500);
+
 
                 } else {
                     setStatus("❌ Could not understand. Please try again.");
@@ -909,6 +930,7 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
                 setStatus("❌ Error processing audio. Please try typing instead.");
             }
         }
+        
 
         function speakText(text) {
             if (!speechSynthesis) return;
