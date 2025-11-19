@@ -1,193 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>परिचारिका - Paricharika | AI Food Ordering</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>परिचारिका - Paricharika | AI Food Ordering</title>
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+    .container {
+        width: 100%;
+        max-width: 900px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
 
-        .header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 30px;
-            text-align: center;
-            color: white;
-        }
+    .header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+    }
 
-        .chat-container {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-        }
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+    }
 
-        .message { display: flex; gap: 10px; margin-bottom: 15px; }
-        .message.user { flex-direction: row-reverse; }
+    .message { display: flex; gap: 10px; margin-bottom: 15px; }
+    .message.user { flex-direction: row-reverse; }
 
-        .bubble {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-        }
+    .bubble {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 18px;
+    }
 
-        .message.user .bubble {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
+    .message.user .bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
 
-        .message.assistant .bubble {
-            background: white;
-            border: 2px solid #e0e0e0;
-        }
+    .message.assistant .bubble {
+        background: white;
+        border: 2px solid #e0e0e0;
+    }
 
-        .avatar {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
-        }
+    .avatar {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; align-items:center; justify-content:center;
+        font-size:20px;
+    }
 
-        .controls { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
-        #userInput { flex: 1; padding: 15px; border-radius: 25px; border: 2px solid #e0e0e0; }
+    .controls { padding:20px; background:white; border-top:1px solid #e0e0e0; }
+    #userInput { flex:1; padding:15px; border-radius:25px; border:2px solid #e0e0e0; }
 
-        .btn-voice.recording { animation: pulse 1s infinite; }
-        @keyframes pulse { 0% {opacity:1;} 50%{opacity:.6;} 100%{opacity:1;} }
+    .btn-voice.recording { animation:pulse 1s infinite; }
+    @keyframes pulse { 0%{opacity:1;} 50%{opacity:.6;} 100%{opacity:1;} }
 
-        .status { text-align: center; padding: 10px; }
-    </style>
+    .status { text-align:center; padding:10px; }
+
+    /* Waveform Animation */
+    #waveform {
+        height: 40px;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .bar {
+        width: 4px;
+        height: 10px;
+        background: #764ba2;
+        border-radius: 4px;
+        transition: height 0.1s ease-out;
+    }
+</style>
+
 </head>
 <body>
 
 <div class="container">
     <div class="header">
         <h1>🍽️ परिचारिका</h1>
-        <div class="subtitle">Paricharika - Your AI Food Ordering Assistant</div>
+        <div class="subtitle">Paricharika - Your AI Assistant</div>
     </div>
 
     <div class="chat-container" id="chatContainer">
         <div class="message assistant">
             <div class="avatar">🤖</div>
-            <div class="bubble">Namaste! 🙏 Main Paricharika hoon. Aap kya order karna chahenge?</div>
+            <div class="bubble">Namaste! 🙏 Main Paricharika hoon. Kya madad kar sakti hoon?</div>
         </div>
     </div>
 
     <div class="controls">
-        <div class="input-container" style="display:flex; gap:10px;">
-            <input id="userInput" type="text" placeholder="Type your order..." onkeypress="if(event.key==='Enter') sendMessage();">
+        <div style="display:flex; gap:10px;">
+            <input id="userInput" placeholder="Type..." onkeypress="if(event.key==='Enter') sendMessage();">
             <button onclick="sendMessage()">Send</button>
         </div>
 
-        <div style="margin-top:10px; display:flex; gap:10px;">
-            <button class="btn-voice" id="voiceBtn" onclick="toggleVoice()">
-                <span id="voiceIcon">🎤</span>
-                <span id="voiceText">Voice Order</span>
-            </button>
-        </div>
+        <!-- Wake word waveform -->
+        <div id="waveform"></div>
 
         <div class="status" id="status"></div>
+
+        <button id="voiceBtn" class="btn-voice" onclick="toggleVoice()"
+            style="margin-top:10px; padding:10px 20px;">
+            <span id="voiceIcon">🎤</span>
+            <span id="voiceText">Voice</span>
+        </button>
     </div>
 </div>
 
 
 <script>
 // ---------------------------
-// GLOBALS
+// GLOBAL STATE
 // ---------------------------
-const API_KEYS = {
-    GROQ: "YOUR_GROQ_KEY"
-};
-
 let isRecording = false;
 let mediaRecorder = null;
 let audioChunks = [];
+
 let silenceTimer = null;
 let silenceTimeoutMs = 5000;
+
 let continuousMode = true;
+let wakeWordEnabled = true;
+
+let wakeStream;
+let wakeContext;
+let wakeAnalyzer;
+
 let conversationHistory = [];
 
 // ---------------------------
-// CHAT HELPERS
+// WAVEFORM SETUP
 // ---------------------------
-function addMessage(text, isUser = false) {
+const waveform = document.getElementById("waveform");
+for (let i = 0; i < 20; i++) {
+    const bar = document.createElement("div");
+    bar.className = "bar";
+    waveform.appendChild(bar);
+}
+const bars = document.querySelectorAll(".bar");
+
+function animateWaveform(volume) {
+    const level = Math.min(1, volume / 50);
+
+    bars.forEach((bar, i) => {
+        const h = 10 + Math.random() * 30 * level;
+        bar.style.height = h + "px";
+    });
+}
+
+// ---------------------------
+// WAKE WORD DETECTION
+// ---------------------------
+async function startWakeWord() {
+    wakeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    wakeContext = new AudioContext();
+    const source = wakeContext.createMediaStreamSource(wakeStream);
+
+    wakeAnalyzer = wakeContext.createAnalyser();
+    wakeAnalyzer.fftSize = 1024;
+
+    source.connect(wakeAnalyzer);
+
+    detectWakeWord();
+}
+
+function detectWakeWord() {
+    const buffer = new Uint8Array(wakeAnalyzer.frequencyBinCount);
+
+    function loop() {
+        wakeAnalyzer.getByteFrequencyData(buffer);
+
+        const volume = buffer.reduce((a, b) => a + b, 0) / buffer.length;
+
+        animateWaveform(volume);
+
+        if (volume > 65) {
+            // Check keyword from WebSpeech
+            tryWakeWord();
+        }
+
+        requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+// Soft keyword spotting using SpeechRecognition
+function tryWakeWord() {
+    if (!wakeWordEnabled) return;
+
+    const sr = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    sr.lang = "en-US";
+    sr.interimResults = false;
+    sr.maxAlternatives = 1;
+
+    sr.onresult = (e) => {
+        const transcript = e.results[0][0].transcript.toLowerCase();
+        console.log("Wake heard:", transcript);
+
+        if (transcript.includes("hey paricharika") ||
+            transcript.includes("paricharika") ||
+            transcript.includes("pari chalo") ||
+            transcript.includes("hey pari")) {
+
+            wakeWordEnabled = false;
+
+            speakText("Haan ji? Sun rahi hoon.");
+            setTimeout(() => toggleVoice(true), 400);
+        }
+    };
+
+    sr.start();
+}
+
+// ---------------------------
+// SPEECH SYNTHESIS
+// ---------------------------
+function speakText(text) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "hi-IN";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+}
+
+// ---------------------------
+// ADD MESSAGE TO CHAT
+// ---------------------------
+function addMessage(text, user=false) {
     const chat = document.getElementById("chatContainer");
     const div = document.createElement("div");
-    div.className = `message ${isUser ? "user" : "assistant"}`;
+    div.className = "message " + (user ? "user" : "assistant");
     div.innerHTML = `
-        <div class="avatar">${isUser ? "👤" : "🤖"}</div>
+        <div class="avatar">${user ? "👤" : "🤖"}</div>
         <div class="bubble">${text}</div>
     `;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 }
 
-function speakText(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "hi-IN";
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-}
-
 // ---------------------------
-// GROQ AI RESPONSE
+// GROQ RESPONSE
 // ---------------------------
-async function getAIResponse(userMessage) {
-    conversationHistory.push({ role: "user", content: userMessage });
-
-    const messages = [
-        { role: "system", content: "You are Paricharika, a friendly Hinglish assistant." },
-        ...conversationHistory.slice(-4)
-    ];
-
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${API_KEYS.GROQ}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            temperature: 0.6,
-            messages
-        })
-    });
+async function getAIResponse(msg) {
+    const resp = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer YOUR_GROQ_KEY",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    { role:"system", content:"You are Paricharika." },
+                    { role:"user", content: msg }
+                ]
+            })
+        }
+    );
 
     const data = await resp.json();
-    const reply = data.choices[0].message.content;
-
-    conversationHistory.push({ role: "assistant", content: reply });
-    return reply;
+    return data.choices[0].message.content;
 }
 
 // ---------------------------
 // SEND MESSAGE
 // ---------------------------
-async function sendMessage(textOverride = null) {
+async function sendMessage(txt=null) {
     const input = document.getElementById("userInput");
-    const msg = textOverride || input.value.trim();
+    const msg = txt || input.value.trim();
     if (!msg) return;
 
-    if (!textOverride) input.value = "";
-
+    input.value = "";
     addMessage(msg, true);
 
     const reply = await getAIResponse(msg);
@@ -196,9 +302,9 @@ async function sendMessage(textOverride = null) {
 }
 
 // ---------------------------
-// VOICE RECORDING (Continuous)
+// VOICE RECORDING
 // ---------------------------
-async function toggleVoice(auto = false) {
+async function toggleVoice(auto=false) {
     const btn = document.getElementById("voiceBtn");
     const icon = document.getElementById("voiceIcon");
     const text = document.getElementById("voiceText");
@@ -206,89 +312,72 @@ async function toggleVoice(auto = false) {
     if (!auto) continuousMode = false;
 
     if (!isRecording) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
 
-            let options = { mimeType: "audio/webm" };
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) options = {};
+        mediaRecorder.ondataavailable = (e) => {
+            audioChunks.push(e.data);
 
-            mediaRecorder = new MediaRecorder(stream, options);
-            audioChunks = [];
+            if (silenceTimer) clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => toggleVoice(true), silenceTimeoutMs);
+        };
 
-            mediaRecorder.ondataavailable = e => {
-                audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+            const blob = new Blob(audioChunks, { type:"audio/webm" });
+            stream.getTracks().forEach(t => t.stop());
 
-                if (silenceTimer) clearTimeout(silenceTimer);
-                silenceTimer = setTimeout(() => toggleVoice(true), silenceTimeoutMs);
-            };
+            await processVoice(blob);
 
-            mediaRecorder.onstop = async () => {
-                const blob = new Blob(audioChunks, { type: "audio/webm" });
-                stream.getTracks().forEach(t => t.stop());
-                await processVoiceInput(blob);
+            if (continuousMode) {
+                setTimeout(() => toggleVoice(true), 300);
+            }
+        };
 
-                if (continuousMode) {
-                    setTimeout(() => toggleVoice(true), 400);
-                }
-            };
+        mediaRecorder.start();
+        isRecording = true;
 
-            mediaRecorder.start();
-            isRecording = true;
+        btn.classList.add("recording");
+        text.textContent = "Listening…";
 
-            btn.classList.add("recording");
-            icon.textContent = "⏹️";
-            text.textContent = "Listening...";
-            document.getElementById("status").innerText = "🎤 Listening…";
-
-        } catch (err) {
-            alert("Mic blocked.");
-        }
     } else {
         mediaRecorder.stop();
         isRecording = false;
 
         btn.classList.remove("recording");
-        icon.textContent = "🎤";
-        text.textContent = "Voice Order";
-        document.getElementById("status").innerText = "";
+        text.textContent = "Voice";
     }
 }
 
 // ---------------------------
-// PROCESS RECORDED AUDIO
+// PROCESS AUDIO → BACKEND
 // ---------------------------
-async function processVoiceInput(blob) {
+async function processVoice(blob) {
     const form = new FormData();
-    form.append("audio", blob, "audio.webm");
+    form.append("audio", blob);
 
-    try {
-        const resp = await fetch("https://paricharika.onrender.com/asr", {
-            method: "POST",
-            body: form
-        });
+    const resp = await fetch("https://paricharika.onrender.com/asr", {
+        method:"POST",
+        body:form
+    });
 
-        const data = await resp.json();
-        const transcript = data.transcript?.trim();
+    const data = await resp.json();
+    const t = data.transcript?.trim();
 
-        if (!transcript) return;
+    if (!t) return;
 
-        addMessage(transcript, true);
+    addMessage(t, true);
 
-        const reply = await getAIResponse(transcript);
-        addMessage(reply, false);
-        speakText(reply);
-
-    } catch (err) {
-        console.error("ASR error:", err);
-    }
+    const reply = await getAIResponse(t);
+    addMessage(reply, false);
+    speakText(reply);
 }
 
 // ---------------------------
-// AUTO-START CONTINUOUS MODE
-// ---------------------------
+// AUTO START WAKE WORD
+---------------------------
 window.onload = () => {
-    continuousMode = true;
-    toggleVoice(true);
+    startWakeWord();
 };
 </script>
 
