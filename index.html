@@ -586,50 +586,68 @@ Respond in 1-2 sentences only in conversational Hinglish.`;
             addMessage(menuText.replace(/\n/g, '<br>').replace(/\*/g, '<strong>').replace(/<\/strong>/g, '</strong>'));
         }
 
-        async function toggleVoice() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert('Voice recording not supported in your browser');
-                return;
+   async function toggleVoice() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Voice recording not supported in your browser');
+        return;
+    }
+
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceIcon = document.getElementById('voiceIcon');
+    const voiceText = document.getElementById('voiceText');
+
+    if (!isRecording) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // 💥 IMPORTANT: Set correct MIME type
+            let options = { mimeType: "audio/webm" };
+
+            // Fallback detection: some browsers reject unsupported mimetypes
+            if (!MediaRecorder.isTypeSupported("audio/webm")) {
+                options = { mimeType: "audio/ogg" };
+            }
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = {}; // browser picks default
             }
 
-            const voiceBtn = document.getElementById('voiceBtn');
-            const voiceIcon = document.getElementById('voiceIcon');
-            const voiceText = document.getElementById('voiceText');
+            mediaRecorder = new MediaRecorder(stream, options);
 
-            if (!isRecording) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
+            audioChunks = [];
 
-                    mediaRecorder.ondataavailable = (e) => {
-                        audioChunks.push(e.data);
-                    };
+            mediaRecorder.ondataavailable = (e) => {
+                audioChunks.push(e.data);
+            };
 
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        await processVoiceInput(audioBlob);
-                        stream.getTracks().forEach(track => track.stop());
-                    };
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: options.mimeType });
+                await processVoiceInput(audioBlob);
+                
+                // Stop mic access
+                stream.getTracks().forEach(track => track.stop());
+            };
 
-                    mediaRecorder.start();
-                    isRecording = true;
-                    voiceBtn.classList.add('recording');
-                    voiceIcon.textContent = '⏹️';
-                    voiceText.textContent = 'Stop Recording';
-                    setStatus('🎤 Recording... Speak now!');
-                } catch (error) {
-                    alert('Microphone access denied');
-                }
-            } else {
-                mediaRecorder.stop();
-                isRecording = false;
-                voiceBtn.classList.remove('recording');
-                voiceIcon.textContent = '🎤';
-                voiceText.textContent = 'Voice Order';
-                setStatus('Processing...');
-            }
+            mediaRecorder.start();
+
+            isRecording = true;
+            voiceBtn.classList.add('recording');
+            voiceIcon.textContent = '⏹️';
+            voiceText.textContent = 'Stop Recording';
+            setStatus('🎤 Recording... Speak now!');
+
+        } catch (error) {
+            console.error(error);
+            alert('Microphone access denied');
         }
+    } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceIcon.textContent = '🎤';
+        voiceText.textContent = 'Voice Order';
+        setStatus('Processing...');
+    }
+}
 
       async function processVoiceInput(audioBlob) {
     const reader = new FileReader();
